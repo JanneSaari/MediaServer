@@ -1,3 +1,6 @@
+
+--####### TABLE CREATION ###################################
+
 CREATE TABLE song (
     id UUID DEFAULT gen_random_uuid(),
     AlbumID UUID,
@@ -44,3 +47,27 @@ CREATE TABLE file(
     id UUID DEFAULT gen_random_uuid(),
     filepath VARCHAR(255),
     PRIMARY KEY ( id ));
+
+
+-- ########### RELATIONS #################################
+
+ALTER TABLE song
+    ADD FOREIGN KEY (ArtistID) REFERENCES artist(id);
+
+ALTER TABLE song
+    ADD FOREIGN KEY (AlbumID) REFERENCES album(id);
+
+ALTER TABLE album
+    ADD FOREIGN KEY (ArtistID) REFERENCES artist(id);
+
+ALTER TABLE playlist
+    ADD FOREIGN KEY (CreatorID) REFERENCES user_account(id);
+
+ALTER TABLE playlistsongs
+    ADD FOREIGN KEY (PlaylistID) REFERENCES playlist(id);
+
+ALTER TABLE playlistsongs
+    ADD FOREIGN KEY (SongID) REFERENCES song(id);
+
+ALTER TABLE password
+    ADD FOREIGN KEY (userID) REFERENCES user_account(id);
