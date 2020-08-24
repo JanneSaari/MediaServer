@@ -1,0 +1,46 @@
+CREATE TABLE song (
+    id UUID DEFAULT gen_random_uuid(),
+    AlbumID UUID,
+    ArtistID UUID,
+    name VARCHAR(255), 
+    PRIMARY KEY ( id ));
+
+CREATE TABLE artist(
+    id UUID DEFAULT gen_random_uuid(), 
+    name VARCHAR(255),
+    PRIMARY KEY ( id ));
+
+CREATE TABLE album (
+    id UUID DEFAULT gen_random_uuid(),
+    name VARCHAR(255),
+    ArtistID UUID,
+    PRIMARY KEY ( id ));
+
+CREATE TABLE playlist(
+    id UUID DEFAULT gen_random_uuid(),
+    name VARCHAR(255),
+    CreatorID UUID,
+    PRIMARY KEY ( id ));
+
+CREATE TABLE playlistsongs(
+    id UUID DEFAULT gen_random_uuid(),
+    playlistID UUID,
+    songID UUID,
+    orderNumber SMALLINT,
+    PRIMARY KEY ( id ));
+
+CREATE TABLE user_account(
+    id UUID DEFAULT gen_random_uuid(),
+    name VARCHAR(255),
+    PRIMARY KEY ( id ));
+
+CREATE TABLE password(
+    id UUID DEFAULT gen_random_uuid(),
+    pw VARCHAR(255),
+    userID UUID,
+    PRIMARY KEY ( id ));
+
+CREATE TABLE file(
+    id UUID DEFAULT gen_random_uuid(),
+    filepath VARCHAR(255),
+    PRIMARY KEY ( id ));
