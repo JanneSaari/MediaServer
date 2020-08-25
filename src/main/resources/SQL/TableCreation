@@ -5,6 +5,7 @@ CREATE TABLE song (
     id UUID DEFAULT gen_random_uuid(),
     AlbumID UUID,
     ArtistID UUID,
+    FileID UUID,
     name VARCHAR(255), 
     PRIMARY KEY ( id ));
 
@@ -56,6 +57,9 @@ ALTER TABLE song
 
 ALTER TABLE song
     ADD FOREIGN KEY (AlbumID) REFERENCES album(id);
+
+ALTER TABLE song
+    ADD FOREIGN KEY (FileID) REFERENCES file(id);
 
 ALTER TABLE album
     ADD FOREIGN KEY (ArtistID) REFERENCES artist(id);
