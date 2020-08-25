@@ -4,7 +4,7 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
-
+  
   <servlet>
     <servlet-name>HelloWorldServlet</servlet-name>
     <servlet-class>HelloWorldServlet</servlet-class>
@@ -12,5 +12,14 @@
   <servlet-mapping>
     <servlet-name>HelloWorldServlet</servlet-name>
     <url-pattern>/hello</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>SongServlet</servlet-name>
+    <servlet-class>sj.mediaserver.SongServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SongServlet</servlet-name>
+    <url-pattern>/song</url-pattern>
   </servlet-mapping>
 </web-app>
