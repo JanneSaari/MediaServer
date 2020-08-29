@@ -125,12 +125,19 @@ public class DatabaseCreator {
                 String Extensions = FileUtils.readFileToString(SQLExtensionsFile, Charset.defaultCharset());
                 SQLAction(Extensions);
             }
-
+            
+            //Create tables for database
             File TableCreationFile = new File("src/main/resources/SQL/TableCreation");
             String TableString = FileUtils.readFileToString(TableCreationFile, Charset.defaultCharset());
             //String dbString = loadResourceToString(file.getAbsolutePath());
             SQLAction(TableString);
             System.out.println("Tables created successfully...");
+
+            //Create MusicServer database user
+            File CreateUserFile = new File("src/main/resources/SQL/AddDatabaseUser");
+            String CreateUserString = FileUtils.readFileToString(CreateUserFile, Charset.defaultCharset());
+            SQLAction(CreateUserString);
+            System.out.println("Default user MusicServer created on database");
             
         } catch (SQLException SQLe) {
             // Handle error for JDBC

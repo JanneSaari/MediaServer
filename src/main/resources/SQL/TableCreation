@@ -3,10 +3,10 @@
 
 CREATE TABLE song (
     id UUID DEFAULT gen_random_uuid(),
-    AlbumID UUID,
-    ArtistID UUID,
-    FileID UUID,
-    name VARCHAR(255), 
+    name VARCHAR(255),
+    artist_id UUID,
+    album_id UUID,
+    file_id UUID,
     PRIMARY KEY ( id ));
 
 CREATE TABLE artist(
@@ -17,20 +17,20 @@ CREATE TABLE artist(
 CREATE TABLE album (
     id UUID DEFAULT gen_random_uuid(),
     name VARCHAR(255),
-    ArtistID UUID,
+    artist_id UUID,
     PRIMARY KEY ( id ));
 
 CREATE TABLE playlist(
     id UUID DEFAULT gen_random_uuid(),
     name VARCHAR(255),
-    CreatorID UUID,
+    creator_id UUID,
     PRIMARY KEY ( id ));
 
 CREATE TABLE playlistsongs(
     id UUID DEFAULT gen_random_uuid(),
-    playlistID UUID,
-    songID UUID,
-    orderNumber SMALLINT,
+    playlist_id UUID,
+    song_id UUID,
+    order_num SMALLINT,
     PRIMARY KEY ( id ));
 
 CREATE TABLE user_account(
@@ -40,38 +40,39 @@ CREATE TABLE user_account(
 
 CREATE TABLE password(
     id UUID DEFAULT gen_random_uuid(),
-    pw VARCHAR(255),
-    userID UUID,
+    password_hash VARCHAR(255),
+    user_id UUID,
     PRIMARY KEY ( id ));
 
 CREATE TABLE file(
     id UUID DEFAULT gen_random_uuid(),
-    filepath VARCHAR(255),
+    file_path VARCHAR(255),
+    file_type VARCHAR(255),
     PRIMARY KEY ( id ));
 
 
 -- ########### RELATIONS #################################
 
 ALTER TABLE song
-    ADD FOREIGN KEY (ArtistID) REFERENCES artist(id);
+    ADD FOREIGN KEY (artist_id) REFERENCES artist(id);
 
 ALTER TABLE song
-    ADD FOREIGN KEY (AlbumID) REFERENCES album(id);
+    ADD FOREIGN KEY (album_id) REFERENCES album(id);
 
 ALTER TABLE song
-    ADD FOREIGN KEY (FileID) REFERENCES file(id);
+    ADD FOREIGN KEY (file_id) REFERENCES file(id);
 
 ALTER TABLE album
-    ADD FOREIGN KEY (ArtistID) REFERENCES artist(id);
+    ADD FOREIGN KEY (artist_id) REFERENCES artist(id);
 
 ALTER TABLE playlist
-    ADD FOREIGN KEY (CreatorID) REFERENCES user_account(id);
+    ADD FOREIGN KEY (creator_id) REFERENCES user_account(id);
 
 ALTER TABLE playlistsongs
-    ADD FOREIGN KEY (PlaylistID) REFERENCES playlist(id);
+    ADD FOREIGN KEY (playlist_id) REFERENCES playlist(id);
 
 ALTER TABLE playlistsongs
-    ADD FOREIGN KEY (SongID) REFERENCES song(id);
+    ADD FOREIGN KEY (song_id) REFERENCES song(id);
 
 ALTER TABLE password
-    ADD FOREIGN KEY (userID) REFERENCES user_account(id);
+    ADD FOREIGN KEY (user_id) REFERENCES user_account(id);

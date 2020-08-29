@@ -8,4 +8,6 @@ WHERE pg_stat_activity.datname = 'musicdb';
 
 DROP DATABASE IF EXISTS musicdb;
 
+DROP USER IF EXISTS MusicServer;
+
 CREATE DATABASE musicdb;
