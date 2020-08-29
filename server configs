@@ -1,0 +1,5 @@
+server.xml
+    timeout = -1 //may prevent timeouts and errors
+
+jvm options
+    --enable-preview //preview features need to be enabled for text blocks
