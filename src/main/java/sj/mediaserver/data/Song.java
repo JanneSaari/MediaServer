@@ -5,8 +5,8 @@ import java.io.File;
 public class Song {
     
     private String name;
-    private String artist;
-    private String album;
+    private Artist artist;
+    private Album album;
     private File songFile;
     //private Length length;
 
@@ -26,19 +26,19 @@ public class Song {
         this.name = name;
     }
 
-    public String getArtist() {
+    public Artist getArtist() {
         return this.artist;
     }
 
-    public void setArtist(String artist) {
+    public void setArtist(Artist artist) {
         this.artist = artist;
     }
 
-    public String getAlbum() {
+    public Album getAlbum() {
         return this.album;
     }
 
-    public void setAlbum(String album) {
+    public void setAlbum(Album album) {
         this.album = album;
     }
 
