@@ -44,7 +44,7 @@ public class SongServlet extends HttpServlet
     throws ServletException, IOException
     {
         DatabaseAPI api = DatabaseAPI.getInstance();
-        String song = api.GetFilePath();
+        String song = api.getFilePath();
         
         response.setContentType("audio/flac");
 
