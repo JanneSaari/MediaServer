@@ -3,8 +3,14 @@ package sj.mediaserver;
 import java.io.Console;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jaudiotagger.audio.*;
 import org.jaudiotagger.audio.exceptions.*;
@@ -120,6 +126,22 @@ public class DatabaseAPI {
         } catch (CannotReadException | IOException | TagException | ReadOnlyFileException
                 | InvalidAudioFrameException e) {
             // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    void addAllSongRecursively(String folderpath){
+        try (Stream<Path> walk = Files.walk(Paths.get(folderpath))) {
+
+            List<String> result = walk.filter(Files::isRegularFile)
+                    .map(x -> x.toString()).collect(Collectors.toList());
+    
+            for (String string : result) {
+                File file = new File(string);
+                addSongFromFile(file);
+            }
+    
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
