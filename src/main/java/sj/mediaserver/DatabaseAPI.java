@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -218,8 +219,9 @@ public class DatabaseAPI {
         return song;
     }
 
+    //FIXME currently just gets first file and returns its filepath
     String getFilePath() {
-        String filepath = " ";
+        String filepath = "";
         try {
             System.out.println("Starting query.");
             ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM file LIMIT 1");
@@ -244,9 +246,7 @@ public class DatabaseAPI {
         File file = null;
         PreparedStatement ps;
         try {
-            ps = connection.prepareStatement("SELECT * FROM file WHERE id = ?");
-            System.out.println(id);
-            System.out.println(id.toString());
+            ps = connection.prepareStatement("SELECT file_path FROM file WHERE id = ?");
             ps.setObject(1, id);
             //ResultSet resultSet = connection.createStatement().executeQuery("SELECT 1 FROM file WHERE id = " + uuid.toString());
             ResultSet resultSet = ps.executeQuery();
@@ -260,6 +260,54 @@ public class DatabaseAPI {
 
         return file;
     }
+
+
+    /**
+     * Get list of all artists in database and return it
+     * @return ArrayList<Artist> list of all artists in database
+     */
+    ArrayList<Artist> getArtists() {
+        ArrayList<Artist> artists = new ArrayList<>();
+        try {
+            System.out.println("Starting query.");
+            ResultSet resultSet = connection.createStatement().executeQuery("SELECT name FROM artist");
+            while (resultSet.next()) {
+                Artist artist = new Artist();
+                artist.setName(resultSet.getString("name"));
+                artists.add(artist);
+                System.out.println("Query result: " + artist.getName());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return artists;
+    }
+
+
+    /**
+     * Get list of all albums in database and return it
+     * @return ArrayList<Album> list of all albums in database
+     */
+    ArrayList<Album> getAlbums() {
+        ArrayList<Album> albums = new ArrayList<>();
+        try {
+            System.out.println("Starting query.");
+            ResultSet resultSet = connection.createStatement().executeQuery("SELECT name FROM album");
+            while (resultSet.next()) {
+                Album album = new Album();
+                album.setName(resultSet.getString("name"));
+                albums.add(album);
+                System.out.println("Query result: " + album.getName());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return albums;
+    }
+
+
 
     void addUser() {
 
