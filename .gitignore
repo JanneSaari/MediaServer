@@ -5,8 +5,10 @@
 /.settings/*
 /.vscode/*
 
+# vs code generated files 
+.classpath
+.project
+
 #audio files for testing
 *.mp3
 *.flac
-
-.classpath
