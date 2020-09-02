@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 public class SongServlet extends HttpServlet 
@@ -48,7 +49,18 @@ public class SongServlet extends HttpServlet
         String uuid = request.getParameter("id");
         File song = api.getFile(UUID.fromString(uuid));
         
-        response.setContentType("audio/flac");
+        //Check for file extension and set content type accordinly
+        String fileType = FilenameUtils.getExtension(song.getName());
+        switch (fileType) {
+            case "flac":
+                response.setContentType("audio/flac");
+                break;
+            case "mp3":
+                response.setContentType("audio/mpeg");
+                break;
+            default:
+                break;
+        }
 
         ServletOutputStream stream = response.getOutputStream();
         response.setHeader("Accept-Ranges", "bytes");
@@ -63,23 +75,6 @@ public class SongServlet extends HttpServlet
             //TODO: handle exception
             e.printStackTrace();
         }
-
-        // try {
-        //     FileInputStream stream = new FileInputStream(new File(song));
-        //     int c;
-        //     while ((c=stream.read()) != -1) {
-        //         response.getWriter().write(c);
-        //         //System.out.println("Writing response" + c);
-        //     }
-        //     response.getWriter().flush();
-        //     System.out.println("Response writer flushed");
-        // } catch (Exception e) {
-        //     //TODO: handle exception
-        //     e.printStackTrace();
-        // }
-        // PrintWriter writer = response.getWriter();
-        // String SongResponse="$String".replace("$String", song);
-        // writer.println(SongResponse);
     }
 
     public static int copy(InputStream input, OutputStream output) throws IOException {
