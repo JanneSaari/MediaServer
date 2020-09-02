@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.sql.*;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -76,14 +77,14 @@ public class DatabaseAPI {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+     *  Read and add song, artist, album, etc.. to database from file
+     */
     void addSongFromFile(File file) {
-        /*
-        Read and add song, artist, album, etc.. to database from file
-        */
 
         try {
-            // Metadata test
+            // Metadata
             AudioFile audioFile;
             Tag tag;
             AudioHeader audioHeader;
@@ -113,7 +114,7 @@ public class DatabaseAPI {
             else
                 System.out.println("Album: " + album.getName() + " already exists in database!");
 
-            //Test Song
+            //Song
             Song song = new Song();
             song.setName(tag.getFirst(FieldKey.TITLE));
             song.setAlbum(album);
@@ -130,7 +131,14 @@ public class DatabaseAPI {
         }
     }
 
+
+    /**
+    * Adds all songs, artists, etc from folder and subfolders to database
+    */
     void addAllSongRecursively(String folderpath){
+        //TODO make library directories that get scanned automatically and changes get added to database
+        //TODO rename to something better
+
         try (Stream<Path> walk = Files.walk(Paths.get(folderpath))) {
 
             List<String> result = walk.filter(Files::isRegularFile)
@@ -162,18 +170,12 @@ public class DatabaseAPI {
             e.printStackTrace();
         }
     }
-
-    Song getSongData() {
-
-        Song song = new Song();
-        return song;
-    }
-
+    
     void addArtist(Artist artist) {
         System.out.println("Trying to add artist: " + artist.getName());
         try {
             addArtistStatement.setString(1, artist.getName());
-
+            
             addArtistStatement.executeUpdate();
             System.out.println("Artist: " + artist.getName() + " added successfully!");
         } catch (Exception e) {
@@ -181,13 +183,13 @@ public class DatabaseAPI {
             e.printStackTrace();
         }
     }
-
+    
     void addAlbum(Album album) {
         System.out.println("Trying to add album: " + album.getName());
         try {
             addAlbumStatement.setString(1, album.getName());
             addAlbumStatement.setString(2, album.getArtist().getName());
-
+            
             addAlbumStatement.executeUpdate();
             System.out.println("Album: " + album.getName() + " added successfully!");
         } catch (Exception e) {
@@ -195,12 +197,12 @@ public class DatabaseAPI {
             e.printStackTrace();
         }
     }
-
+    
     void addFile(File file) {
         System.out.println("Trying to add file: " + file.getAbsolutePath());
         try {
             addFileStatement.setString(1, file.getAbsolutePath());
-
+            
             addFileStatement.executeUpdate();
             System.out.println("File: " + file.getAbsolutePath() + " added successfully!");
         } catch (SQLException e) {
@@ -208,12 +210,19 @@ public class DatabaseAPI {
             e.printStackTrace();
         }
     }
+    
+    Song getSongData() {
+        //Currently just a placeholder function 
+        
+        Song song = new Song();
+        return song;
+    }
 
     String getFilePath() {
         String filepath = " ";
         try {
             System.out.println("Starting query.");
-            ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM file");
+            ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM file LIMIT 1");
             while (resultSet.next()) {
                 filepath = resultSet.getString("file_path");
                 System.out.println("Query result: " + filepath);
@@ -223,19 +232,33 @@ public class DatabaseAPI {
         }
         return filepath;
     }
+    
+    //TODO create another file function getFile(Song) to get file identified from song data
+    /**
+     * Get file from database identified by UUID file_id
+     * @param id 
+     * @return File. Returns file identified by id.
+     */
+    File getFile(UUID id) {
 
-    File getSongFile() {
+        File file = null;
+        PreparedStatement ps;
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM file LIMIT 1");
+            ps = connection.prepareStatement("SELECT * FROM file WHERE id = ?");
+            System.out.println(id);
+            System.out.println(id.toString());
+            ps.setObject(1, id);
+            //ResultSet resultSet = connection.createStatement().executeQuery("SELECT 1 FROM file WHERE id = " + uuid.toString());
+            ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
-                File file = new File(resultSet.getString("file_path"));
+                file = new File(resultSet.getString("file_path"));
                 System.out.println(file.getAbsolutePath());
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        Song song = new Song();
-        return song.getSongFile();
+
+        return file;
     }
 
     void addUser() {

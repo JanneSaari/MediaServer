@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.UUID;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
@@ -44,7 +45,8 @@ public class SongServlet extends HttpServlet
     throws ServletException, IOException
     {
         DatabaseAPI api = DatabaseAPI.getInstance();
-        String song = api.getFilePath();
+        String uuid = request.getParameter("id");
+        File song = api.getFile(UUID.fromString(uuid));
         
         response.setContentType("audio/flac");
 
@@ -53,7 +55,7 @@ public class SongServlet extends HttpServlet
 
         byte[] audioBytes = null;
         try {
-            audioBytes = FileUtils.readFileToByteArray(new File(song));
+            audioBytes = FileUtils.readFileToByteArray(song);
             response.setContentLength(audioBytes.length);
             ByteArrayInputStream inputStream = new ByteArrayInputStream(audioBytes);
             IOUtils.copy(inputStream, stream);
