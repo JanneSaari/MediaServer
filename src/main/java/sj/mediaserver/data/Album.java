@@ -1,10 +1,18 @@
 package sj.mediaserver.data;
 
+import java.util.ArrayList;
+
 public class Album {
     
     String name;
     Artist artist;
-    Song[] songs;
+    ArrayList<Song> songs;
+
+    public Album() {}
+
+    public Album(String name) {
+        this.name = name;
+    }
 
     public String getName() {
         return this.name;
@@ -22,11 +30,11 @@ public class Album {
         this.artist = artist;
     }
 
-    public Song[] getSongs() {
+    public ArrayList<Song> getSongs() {
         return this.songs;
     }
 
-    public void setSongs(Song[] songs) {
+    public void setSongs(ArrayList<Song> songs) {
         this.songs = songs;
     }
 

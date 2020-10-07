@@ -17,6 +17,8 @@ import java.util.stream.Stream;
 import org.jaudiotagger.audio.*;
 import org.jaudiotagger.audio.exceptions.*;
 import org.jaudiotagger.tag.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import sj.mediaserver.data.Album;
 import sj.mediaserver.data.Artist;
@@ -96,7 +98,7 @@ public class DatabaseAPI {
             
             //Artist
             Artist artist = new Artist();
-            artist.setName(tag.getFirst(FieldKey.ARTIST));
+            artist.setName(tag.getFirst(FieldKey.ALBUM_ARTIST));
             System.out.println(checkIfArtistExists(artist.getName()));
             if(!checkIfArtistExists(artist.getName())){
                 addArtist(artist);
@@ -223,11 +225,9 @@ public class DatabaseAPI {
     String getFilePath() {
         String filepath = "";
         try {
-            System.out.println("Starting query.");
             ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM file LIMIT 1");
             while (resultSet.next()) {
                 filepath = resultSet.getString("file_path");
-                System.out.println("Query result: " + filepath);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -237,8 +237,8 @@ public class DatabaseAPI {
     
     //TODO create another file function getFile(Song) to get file identified from song data
     /**
-     * Get file from database identified by UUID file_id
-     * @param id 
+     * Get file from database identified by UUID id
+     * @param id Used to identify wanted file
      * @return File. Returns file identified by id.
      */
     File getFile(UUID id) {
@@ -248,11 +248,40 @@ public class DatabaseAPI {
         try {
             ps = connection.prepareStatement("SELECT file_path FROM file WHERE id = ?");
             ps.setObject(1, id);
-            //ResultSet resultSet = connection.createStatement().executeQuery("SELECT 1 FROM file WHERE id = " + uuid.toString());
+            //ResultSet resultSet = connection.createStatement().executeQuery("SELECT 1 FROM file WHERE id = " + id.toString());
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 file = new File(resultSet.getString("file_path"));
-                System.out.println(file.getAbsolutePath());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return file;
+    }
+
+
+    /**
+     * Get file from database identified by songID. If you have fileID, use getFile(UUID id) instead
+     * @param songID Used to identify wanted file. Note: this is songID, not fileID.
+     * @return File identified by songID
+     */
+    File getFileFromSongID(UUID songID) {
+
+        File file = null;
+        PreparedStatement ps;
+        try {
+            ps = connection.prepareStatement("""
+                SELECT file_path
+                FROM file
+                INNER JOIN song
+                    on song.file_id = file.id
+                    WHERE song.id = ?
+            """);
+            ps.setObject(1, songID);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                file = new File(resultSet.getString("file_path"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -268,20 +297,108 @@ public class DatabaseAPI {
      */
     ArrayList<Artist> getArtists() {
         ArrayList<Artist> artists = new ArrayList<>();
+        PreparedStatement ps;
         try {
-            System.out.println("Starting query.");
-            ResultSet resultSet = connection.createStatement().executeQuery("SELECT name FROM artist");
+            ps = connection.prepareStatement("""
+                SELECT
+                    name
+                FROM
+                    artist
+                """);
+            ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
-                Artist artist = new Artist();
-                artist.setName(resultSet.getString("name"));
+                Artist artist = new Artist(resultSet.getString("name"));
                 artists.add(artist);
-                System.out.println("Query result: " + artist.getName());
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return artists;
+    }
+
+    /**
+     * Get list of all artists with their albums and songs
+     * Returns list in format:
+     * Artists[]
+     *      Albums[]
+     *          Songs[]
+     * @return ArrayList<Artist> list of all artists and their albums and songs
+     */
+    JSONArray getLibraryList() {
+        JSONArray arrayList = new JSONArray();
+        PreparedStatement ps;
+        try {
+            ps = connection.prepareStatement("""
+                SELECT
+                json_build_object(
+                    'artist_name', artist.name,
+                    'albums', json_agg(
+                        json_build_object(
+                            'album_name', to_json(album.name),
+                            'songs', (
+                                SELECT json_agg(
+                                    json_build_object(
+                                        'song_name', song.name,
+                                        'song_id', song.id)
+                                    )
+                                FROM song
+                                WHERE song.album_id = album.id
+                            )
+                        )
+                    )
+                )
+                FROM artist
+                INNER JOIN album
+                    on album.artist_id = artist.id
+                GROUP BY artist.name
+                """);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                JSONObject object = new JSONObject(resultSet.getString("json_build_object"));
+                arrayList.put(object);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return arrayList;
+    }
+
+    /**
+     * Get list of all songs in database and return it
+     * @return ArrayList<Song> list of all songs in database
+     */
+    ArrayList<Song> getSongs() {
+        ArrayList<Song> songs = new ArrayList<>();
+        PreparedStatement ps;
+        try {
+            ps = connection.prepareStatement("""
+                SELECT
+                    song.name as song_name,
+                    artist.name as artist_name,
+                    album.name as album_name
+                FROM 
+                    song
+                INNER JOIN album
+                    on song.album_id = album.id
+                INNER JOIN artist
+                    on song.artist_id = artist.id        
+                """);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                Song song = new Song();
+                song.setName(resultSet.getString("song_name"));
+                song.setAlbum(resultSet.getString("album_name"));
+                song.setArtist(resultSet.getString("artist_name"));
+                
+                songs.add(song);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return songs;
     }
 
 
@@ -292,13 +409,11 @@ public class DatabaseAPI {
     ArrayList<Album> getAlbums() {
         ArrayList<Album> albums = new ArrayList<>();
         try {
-            System.out.println("Starting query.");
             ResultSet resultSet = connection.createStatement().executeQuery("SELECT name FROM album");
             while (resultSet.next()) {
                 Album album = new Album();
                 album.setName(resultSet.getString("name"));
                 albums.add(album);
-                System.out.println("Query result: " + album.getName());
             }
         } catch (SQLException e) {
             e.printStackTrace();

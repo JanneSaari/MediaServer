@@ -22,4 +22,13 @@
     <servlet-name>SongServlet</servlet-name>
     <url-pattern>/song</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>LibraryServlet</servlet-name>
+    <servlet-class>sj.mediaserver.LibraryServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LibraryServlet</servlet-name>
+    <url-pattern>/lib</url-pattern>
+  </servlet-mapping>
 </web-app>

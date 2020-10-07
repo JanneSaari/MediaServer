@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <meta charset="utf-8">
+        <style>
+            /* Sidebar */
+            .sidebar {
+              height: 100%; /* Full-height: remove this if you want "auto" height */
+              width: 360px; /* Set the width of the sidebar */
+              position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+              z-index: 1; /* Stay on top */
+              top: 0; /* Stay at the top */
+              left: 0;
+              background-color: #111; /* Black */
+              overflow-x: hidden; /* Disable horizontal scroll */
+              padding-top: 20px;
+            }
+
+            /* The navigation menu links */
+            .sidebar li {
+              padding: 6px 8px 6px 16px;
+              text-decoration: none;
+              font-size: 25px;
+              color: #818181;
+              display: block;
+            }
+
+            /* Style page content */
+            .main {
+              margin-left: 360px; /* Same as the width of the sidebar */
+              padding: 0px 10px;
+            }
+
+            /* don't target ll list items in you page, be more specific */
+            .drop-nav > ul {
+            display: none;
+            }
+
+            .drop-nav.active > ul {
+            display: block;
+            }
+        </style>
+    </head>
+    <body>
+      <div class="sidebar">
+        <ul id="artist-list">
+        </ul>
+      </div>
+
+      <div class="main">
+        <audio id="audio" controls="controls">
+          <source id="audioSource" src="" type="audio/flac">
+          Your browser does not support the audio tag.
+        </audio> 
+      </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" crossorigin="anonymous"></script>
+        <script>
+            $("document").ready(function(){
+              
+              var data;
+              $.getJSON("/MediaServer/lib", function(data) {
+                var ul = document.getElementById("artist-list");
+                $.each( data, function( key, value ) {
+                  createArtistEntry(value);
+                });
+
+                $(".drop-nav").on("click", function(e) {
+                    e.preventDefault()
+                    e.stopImmediatePropagation()
+                    $(this).toggleClass('active')
+                })
+                function makeUL(array){}
+
+                $(".player-resource").on("click", function(e){
+                  e.preventDefault();
+                  e.stopImmediatePropagation();
+
+                  var elm = e.target;
+                  var audio = document.getElementById("audio");
+
+                  var source = document.getElementById("audioSource");
+                  source.src = "http://localhost:8080/MediaServer/song?id=" + elm.getAttribute("songid");
+
+                  audio.load();
+                  audio.play();
+                })
+              });
+            });
+
+            function createArtistEntry(artistJSON) {
+              var ul = document.getElementById("artist-list");
+
+              var li = document.createElement("li");
+              li.innerHTML = "<div>" + artistJSON.artist_name + "</div>";
+              if(artistJSON.artist_name == ""){
+                li.innerHTML = "<div>No name</div>";
+              }
+              ul.appendChild(li);
+              li.className = "drop-nav";
+
+              createAlbumList(li, artistJSON.albums);
+            }
+
+            function createAlbumList(listItem, albumList) {
+              var list = document.createElement("ul");
+
+              jQuery.each(albumList, function(i, value) {
+                var albumItem = document.createElement("li");
+                albumItem.innerHTML = "<div>" + value.album_name + "</div>";
+                albumItem.className = "drop-nav";
+                list.appendChild(albumItem);
+
+                createSongList(albumItem, value.songs)
+              });
+
+              listItem.appendChild(list);
+            }
+
+            function createSongList(listItem, songList) {
+              var list = document.createElement("ul");
+
+              jQuery.each(songList, function(i, value) {
+                var songItem = document.createElement("li");
+                songItem.innerHTML = value.song_name;
+                list.appendChild(songItem);
+                songItem.className = "player-resource";
+                songItem.setAttribute("songid", value.song_id);
+              })
+
+              listItem.appendChild(list);
+            }
+        </script>
+    </body>
+</html>
