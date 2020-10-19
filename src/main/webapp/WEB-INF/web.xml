@@ -31,4 +31,13 @@
     <servlet-name>LibraryServlet</servlet-name>
     <url-pattern>/lib</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSONTest</servlet-name>
+    <servlet-class>sj.mediaserver.JSONTest</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSONTest</servlet-name>
+    <url-pattern>/json</url-pattern>
+  </servlet-mapping>
 </web-app>

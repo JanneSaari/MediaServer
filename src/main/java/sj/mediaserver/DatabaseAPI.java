@@ -321,9 +321,13 @@ public class DatabaseAPI {
      * Get list of all artists with their albums and songs
      * Returns list in format:
      * Artists[]
+     *      artist_name,
      *      Albums[]
+     *          album_name,
      *          Songs[]
-     * @return ArrayList<Artist> list of all artists and their albums and songs
+     *              song_name,
+     *              song_id
+     * @return JSONArray list of all artists and their albums and songs in JSON form
      */
     JSONArray getLibraryList() {
         JSONArray arrayList = new JSONArray();
@@ -336,6 +340,7 @@ public class DatabaseAPI {
                     'albums', json_agg(
                         json_build_object(
                             'album_name', to_json(album.name),
+                            'album_id', to_json(album.id),
                             'songs', (
                                 SELECT json_agg(
                                     json_build_object(
@@ -353,6 +358,37 @@ public class DatabaseAPI {
                     on album.artist_id = artist.id
                 GROUP BY artist.name
                 """);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                JSONObject object = new JSONObject(resultSet.getString("json_build_object"));
+                arrayList.put(object);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return arrayList;
+    }
+
+    /**
+     * Get list of songs in album
+     * @param album 
+     * @return JSONArray of all songs in album
+     */
+    JSONArray getSongList(UUID albumID) {
+        JSONArray arrayList = new JSONArray();
+        PreparedStatement ps;
+        try {
+            ps = connection.prepareStatement("""
+                SELECT
+                    json_build_object(
+                        'song_name', song.name,
+                        'song_id', song.id
+                    )
+                FROM song
+                WHERE song.album_id = ?;
+                """);
+            ps.setObject(1, albumID);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 JSONObject object = new JSONObject(resultSet.getString("json_build_object"));
