@@ -12,3 +12,6 @@
 #audio files for testing
 *.mp3
 *.flac
+
+#3rd party
+src/main/webapp/js/jquery-3.5.1.js
