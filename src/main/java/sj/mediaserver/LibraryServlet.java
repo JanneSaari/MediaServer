@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
 import org.json.JSONArray;
 
 
 @SuppressWarnings("serial")
+@WebServlet("/lib/*")
 public class LibraryServlet extends HttpServlet {
 
     @Override

@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +17,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
+
+@WebServlet("/song/*")
 public class SongServlet extends HttpServlet 
 {
     /**
