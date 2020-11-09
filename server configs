@@ -1,6 +1,14 @@
 server.xml
     timeout = -1 //may prevent timeouts and errors
 
+    configure ssl https://tomcat.apache.org/tomcat-9.0-doc/ssl-howto.html
+    example connector configuration:
+        <Connector protocol="org.apache.coyote.http11.Http11NioProtocol"
+        sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation"
+        port="8443" maxThreads="200" scheme="https" secure="true" SSLEnabled="true"
+        keystoreFile="${user.home}/.keystore" keystorePass="!!!!!! put keystore password here(tomcat default="changeit")"
+        clientAuth="false" sslProtocol="TLS"/>
+
 jvm options
     --enable-preview //preview features need to be enabled for text blocks
 
