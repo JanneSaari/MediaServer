@@ -63,19 +63,19 @@ public class DatabaseAPI {
             // Define simple PreparedStatements used for testing for now. May be deleted
             // later if changed to better system
             addSongStatement = connection.prepareStatement("""
-                    INSERT INTO song (name, artist_id, album_id, file_id) VALUES(
+                    INSERT INTO songs (name, artist_id, album_id, file_id) VALUES(
                         ?,
-                        (SELECT id from artist WHERE name = ?),
-                        (SELECT id from album WHERE name = ?),
-                        (SELECT id from file WHERE file_path = ?));
+                        (SELECT id from artists WHERE name = ?),
+                        (SELECT id from albums WHERE name = ?),
+                        (SELECT id from files WHERE file_path = ?));
                     """);
-            addFileStatement = connection.prepareStatement("INSERT INTO file (file_path) VALUES(?)");
-            addArtistStatement = connection.prepareStatement("INSERT INTO artist (name) VALUES(?)");
+            addFileStatement = connection.prepareStatement("INSERT INTO files (file_path) VALUES(?)");
+            addArtistStatement = connection.prepareStatement("INSERT INTO artists (name) VALUES(?)");
             addAlbumStatement = connection.prepareStatement(
-                    "INSERT INTO album (name, artist_id) VALUES(?, (SELECT id from artist WHERE name=?))");
-            getFilePathStatement = connection.prepareStatement("SELECT * FROM file");
-            queryStatement = connection.prepareStatement("SELECT ? FROM artist WHERE name = ?");
-            albumQueryStatement = connection.prepareStatement("SELECT ? FROM album WHERE name = ?");
+                    "INSERT INTO albums (name, artist_id) VALUES(?, (SELECT id from artists WHERE name=?))");
+            getFilePathStatement = connection.prepareStatement("SELECT * FROM files");
+            queryStatement = connection.prepareStatement("SELECT ? FROM artists WHERE name = ?");
+            albumQueryStatement = connection.prepareStatement("SELECT ? FROM albums WHERE name = ?");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -131,6 +131,7 @@ public class DatabaseAPI {
                 | InvalidAudioFrameException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            System.out.println("File that failed: " + file.getAbsolutePath());
         }
     }
 
@@ -168,6 +169,7 @@ public class DatabaseAPI {
 
             addSongStatement.executeUpdate();
             System.out.println("Song: " + song.getArtist().getName() + "-" + song.getName() + " added successfully!");
+            System.out.println("###########################################");
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
@@ -225,7 +227,7 @@ public class DatabaseAPI {
     String getFilePath() {
         String filepath = "";
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM file LIMIT 1");
+            ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM files LIMIT 1");
             while (resultSet.next()) {
                 filepath = resultSet.getString("file_path");
             }
@@ -246,9 +248,8 @@ public class DatabaseAPI {
         File file = null;
         PreparedStatement ps;
         try {
-            ps = connection.prepareStatement("SELECT file_path FROM file WHERE id = ?");
+            ps = connection.prepareStatement("SELECT file_path FROM files WHERE id = ?");
             ps.setObject(1, id);
-            //ResultSet resultSet = connection.createStatement().executeQuery("SELECT 1 FROM file WHERE id = " + id.toString());
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 file = new File(resultSet.getString("file_path"));
@@ -273,10 +274,10 @@ public class DatabaseAPI {
         try {
             ps = connection.prepareStatement("""
                 SELECT file_path
-                FROM file
-                INNER JOIN song
-                    on song.file_id = file.id
-                    WHERE song.id = ?
+                FROM files
+                INNER JOIN songs
+                    on songs.file_id = files.id
+                    WHERE songs.id = ?
             """);
             ps.setObject(1, songID);
             ResultSet resultSet = ps.executeQuery();
@@ -303,7 +304,7 @@ public class DatabaseAPI {
                 SELECT
                     name
                 FROM
-                    artist
+                    artists
                 """);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
@@ -336,27 +337,27 @@ public class DatabaseAPI {
             ps = connection.prepareStatement("""
                 SELECT
                 json_build_object(
-                    'artist_name', artist.name,
+                    'artist_name', artists.name,
                     'albums', json_agg(
                         json_build_object(
-                            'album_name', to_json(album.name),
-                            'album_id', to_json(album.id),
+                            'album_name', to_json(albums.name),
+                            'album_id', to_json(albums.id),
                             'songs', (
                                 SELECT json_agg(
                                     json_build_object(
-                                        'song_name', song.name,
-                                        'song_id', song.id)
+                                        'song_name', songs.name,
+                                        'song_id', songs.id)
                                     )
-                                FROM song
-                                WHERE song.album_id = album.id
+                                FROM songs
+                                WHERE songs.album_id = albums.id
                             )
                         )
                     )
                 )
-                FROM artist
-                INNER JOIN album
-                    on album.artist_id = artist.id
-                GROUP BY artist.name
+                FROM artists
+                INNER JOIN albums
+                    on albums.artist_id = artists.id
+                GROUP BY artists.name
                 """);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
@@ -382,11 +383,11 @@ public class DatabaseAPI {
             ps = connection.prepareStatement("""
                 SELECT
                     json_build_object(
-                        'song_name', song.name,
-                        'song_id', song.id
+                        'song_name', songs.name,
+                        'song_id', songs.id
                     )
-                FROM song
-                WHERE song.album_id = ?;
+                FROM songs
+                WHERE songs.album_id = ?;
                 """);
             ps.setObject(1, albumID);
             ResultSet resultSet = ps.executeQuery();
@@ -411,15 +412,15 @@ public class DatabaseAPI {
         try {
             ps = connection.prepareStatement("""
                 SELECT
-                    song.name as song_name,
-                    artist.name as artist_name,
-                    album.name as album_name
+                    songs.name as song_name,
+                    artists.name as artist_name,
+                    albums.name as album_name
                 FROM 
-                    song
-                INNER JOIN album
-                    on song.album_id = album.id
-                INNER JOIN artist
-                    on song.artist_id = artist.id        
+                    songs
+                INNER JOIN albums
+                    on songs.album_id = albums.id
+                INNER JOIN artists
+                    on songs.artist_id = artists.id        
                 """);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
@@ -445,7 +446,7 @@ public class DatabaseAPI {
     ArrayList<Album> getAlbums() {
         ArrayList<Album> albums = new ArrayList<>();
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery("SELECT name FROM album");
+            ResultSet resultSet = connection.createStatement().executeQuery("SELECT name FROM albums");
             while (resultSet.next()) {
                 Album album = new Album();
                 album.setName(resultSet.getString("name"));
@@ -458,14 +459,95 @@ public class DatabaseAPI {
         return albums;
     }
 
+    //TODO dont use text password
+    int addUser(String userName, String password) {
+        PreparedStatement ps;
+        try {
+            ps = connection.prepareStatement("""
+                WITH data(userName, password) AS (
+                    VALUES (?, crypt(?, gen_salt('bf')))
+                ),
+                ins1 AS (
+                    INSERT INTO users(name)
+                    SELECT userName FROM data
+                --ON CONFLICT DO NOTHING
+                RETURNING id AS user_id
+                )
+                INSERT INTO passwords(password_hash, user_id)
+                SELECT password, ins1.user_id
+                FROM data, ins1
+            """);
 
+            ps.setString(1, userName);
+            ps.setString(2, password);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-    void addUser() {
-
+        return 0;
     }
 
-    void authenticateUser() {
 
+    /**
+     * Check if userName already exists in database
+     * @param userName Username to check
+     * @return -1 if check failed for some reason, 0 if username doesn't exist, 1 if username exists already
+     */
+    int checkIfUserNameExists(String userName) {        
+        PreparedStatement ps;
+        try {
+            ps = connection.prepareStatement("""
+                SELECT name
+                FROM users
+                WHERE name = ?
+            """);
+
+            ps.setString(1, userName);
+
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                return 1;
+            }
+            else
+                return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    /**
+     * Authenticate user
+     * @param userName Username to check
+     * @param password Users password
+     * @return 1 if user is valid. 0 if user is not valid. -1 if authentication failed for some reason
+     */
+    int authenticateUser(String userName, String password) {
+        PreparedStatement ps;
+        try {
+            ps = connection.prepareStatement("""
+                SELECT 
+                    name,
+                    passwords.password_hash as password
+                FROM users
+                INNER JOIN passwords
+                    ON users.id = passwords.user_id
+                WHERE
+                name = ? AND passwords.password_hash = crypt(?, passwords.password_hash)
+            """);
+            ps.setString(1, userName);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                return 1;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+
+        return 0;
     }
 
     void deleteSong() {

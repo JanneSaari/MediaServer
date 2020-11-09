@@ -24,7 +24,7 @@ $("document").ready(function(){
         let audio = document.getElementById("audio");
         
         let source = document.getElementsByClassName("audioSource");
-        source[0].src = "http://" + location.host + "/MediaServer/song?id=" + elm.getAttribute("songid");
+        source[0].src = "https://" + location.host + "/MediaServer/song?id=" + elm.getAttribute("songid");
         
         audio.load();
         audio.play();
@@ -48,7 +48,6 @@ $("document").ready(function(){
       e.stopImmediatePropagation();
 
       let elm = e.target;
-      //let albumID = elm.getAttribute("albumid");
       let albumID = jQuery(this).attr("albumid");
 
       let list = document.getElementById("song-list");
@@ -63,7 +62,14 @@ $("document").ready(function(){
           songItem.setAttribute("songid", value.song_id);
         });
       })
+    })
 
+    $(".album-entry").contextmenu(function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      let element = e.target;
+      addAlbumToPlaylist(element);
     })
   });
 
@@ -79,14 +85,14 @@ function addSongToPlaylist(songElement) {
 
   playList.appendChild(trackRow);
 
-  trackRow.getElementsByClassName("playlist-track")[0].innerHTML = songElement.innerHTML;
+  trackRow.querySelector(".playlist-track").innerHTML = songElement.innerHTML;
   trackRow.getElementsByClassName("track-number")[0].innerHTML = _elements.playListRows.length + ".";
   trackRow.setAttribute("data-track-row", _elements.playListRows.length);
 
   //create new source for audio element
   let source = document.createElement("source");
   source.setAttribute("data-track-number", _elements.playListRows.length);
-  source.src = "http://" + location.host + "/MediaServer/song?id=" + songElement.getAttribute("songid");
+  source.src = "https://" + location.host + "/MediaServer/song?id=" + songElement.getAttribute("songid");
 
   document.getElementById("audio").appendChild(source);
 
@@ -113,7 +119,10 @@ function addSongToPlaylist(songElement) {
       _playBack(this);
     }
   }, false);
-  
+}
+
+function addAlbumToPlaylist(albumElement) {
+
 }
 
 function createArtistEntry(artistJSON) {
