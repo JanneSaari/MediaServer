@@ -1,43 +1,12 @@
-<!DOCTYPE web-app PUBLIC
+<!-- <!DOCTYPE web-app PUBLIC
  "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
- "http://java.sun.com/dtd/web-app_2_3.dtd" >
+ "http://java.sun.com/dtd/web-app_2_3.dtd" > -->
 
 <web-app>
-  <display-name>Archetype Created Web Application</display-name>
-  
-  <servlet>
-    <servlet-name>HelloWorldServlet</servlet-name>
-    <servlet-class>HelloWorldServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>HelloWorldServlet</servlet-name>
-    <url-pattern>/hello</url-pattern>
-  </servlet-mapping>
+  <display-name>Media Server</display-name>
 
-  <servlet>
-    <servlet-name>SongServlet</servlet-name>
-    <servlet-class>sj.mediaserver.SongServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>SongServlet</servlet-name>
-    <url-pattern>/song</url-pattern>
-  </servlet-mapping>
+  <session-config>
+    <session-timeout>120</session-timeout>
+  </session-config>
 
-  <servlet>
-    <servlet-name>LibraryServlet</servlet-name>
-    <servlet-class>sj.mediaserver.LibraryServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>LibraryServlet</servlet-name>
-    <url-pattern>/lib</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>JSONTest</servlet-name>
-    <servlet-class>sj.mediaserver.JSONTest</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>JSONTest</servlet-name>
-    <url-pattern>/json</url-pattern>
-  </servlet-mapping>
 </web-app>
