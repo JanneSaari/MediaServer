@@ -41,7 +41,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.2.16.jre7</version>
+      <version>42.5.4</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
@@ -67,9 +67,9 @@
     </dependency>
 
     <dependency>
-        <groupId>net.jthink</groupId>
-        <artifactId>jaudiotagger</artifactId>
-        <version>2.2.3</version>
+      <groupId>net.jthink</groupId>
+      <artifactId>jaudiotagger</artifactId>
+      <version>3.0.1</version>
     </dependency>
   </dependencies>
 
