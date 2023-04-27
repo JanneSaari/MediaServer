@@ -13,27 +13,26 @@ import org.apache.commons.io.IOUtils;
 public class DatabaseCreator {
 
     /*
-     * Created following https://www.postgresqltutorial.com/ Check
-     * https://jdbc.postgresql.org/documentation/head/index.html for more info about
-     * PostgreSQL JBCD Driver
-     */
-    /*
-     * TODO -On installation, ask user if they want to use (authenticated) database
-     * server(), or create local database without need for authentication
-     */
-    /*
-     * TODO Create database on first time setup Using PostgreSQL installer for now.
-     * Try creating DB from binaries or source later
-     */
-
-    // TODO read database username and password from file or ask the user for them
-
-    /*
-     * TODO try to get ssl working at some point Check https://letsencrypt.org/ for
-     * free ssl certificate, https://www.postgresql.org/docs/9.1/libpq-ssl.html for
-     * more info about postgresql and ssl 
-     static final String url = "jdbc:postgresql://localhost/postgres?ssl=true";
-     */
+    Created following https://www.postgresqltutorial.com/ 
+    Check https://jdbc.postgresql.org/documentation/head/index.html for more info about
+    PostgreSQL JBCD Driver
+    
+    
+    TODO -On installation, ask user if they want to use (authenticated) database
+    server(), or create local database without need for authentication
+    
+    
+    TODO Create database on first time setup. Using PostgreSQL installer for now.
+    // Try creating DB from binaries or source later
+    
+    TODO try to get ssl working at some point Check https://letsencrypt.org/ for
+    free ssl certificate, https://www.postgresql.org/docs/9.1/libpq-ssl.html for
+    more info about postgresql and ssl 
+    static final String url = "jdbc:postgresql://localhost/postgres?ssl=true";
+    */
+    
+    //TODO get Urls, user and passwords from separate source or ask user for them.
+    //Not too big of a deal when using just locally, but if you want to use it over internet, this is not good
     static final String hostUrl = "jdbc:postgresql://localhost/";
     static final String musicDBUrl = "jdbc:postgresql://localhost/musicdb?allowMultiQueries=true";
     static String user = "postgres";
