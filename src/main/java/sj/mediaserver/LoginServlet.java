@@ -2,6 +2,7 @@ package sj.mediaserver;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Base64;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -20,6 +21,7 @@ public class LoginServlet extends HttpServlet {
     throws ServletException, IOException {
 
         //in real life you would probably use JSP to render the login
+		response.getOutputStream().println("<head><meta charset=\"utf-8\"> </head>");
 		response.getOutputStream().println("<h1>Login</h1>");
 		response.getOutputStream().println("<hr/>");
 		response.getOutputStream().println("<form action=\"/MediaServer/login\" method=\"POST\">");
@@ -35,6 +37,15 @@ public class LoginServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
 
+        // String authHeader = request.getHeader("authorization");
+        // String encodedAuth = authHeader.substring(authHeader.indexOf(' ' + 1));
+        // String decodedAuth = new String(Base64.getDecoder().decode(encodedAuth));
+
+        // String username = decodedAuth.substring(0, decodedAuth.indexOf(' '));
+        // String password = decodedAuth.substring(decodedAuth.indexOf(':') + 1);
+
+        // System.out.println("username: " + username + ", password: " + password);
+
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
@@ -44,6 +55,10 @@ public class LoginServlet extends HttpServlet {
         
         //TODO use HSTS do prevent any communication over HTTP and only accept HTTPS
         //https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html
+
+        //TODO!!!!
+        //Read about authorization header https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
+        //!!!!!!!!
 
         //TODO create sanitize check
         if(API.authenticateUser(username, password) == 1){
