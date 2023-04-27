@@ -59,12 +59,14 @@ body {
     // font-size: 1em;
     // margin: 0 auto;
     // width: 500px;
+    overflow: auto;
 
     .player {
-        height: 60px;
-        margin: 0;
+        height: 20%;
+        width: 60%;
+        margin-left: 20%;
         position: relative;
-        width: 400px;
+        // width: 400px;
         @include media(tablet) {
             width: 470px;
         }
@@ -189,13 +191,14 @@ body {
 
     .play-list {
         height: 100%;
-        width: 200px;
+        width: 20%;
         position: fixed;
         z-index: 1;
         top: 0;
         right: 0;
         display: block;
         margin: 0 auto 20px auto;
+        overflow: scroll;
         .play-list-row {
             display: block;
             margin: 10px 0;
@@ -258,7 +261,8 @@ body {
     /* Sidebar */
     .left-sidebar {
         height: 100%; /* Full-height: remove this if you want "auto" height */
-        width: 360px; /* Set the width of the sidebar */
+        // width: 360px; /* Set the width of the sidebar */
+        width: 20%;
         position: fixed; /* Fixed Sidebar (stay in place on scroll) */
         z-index: 1; /* Stay on top */
         top: 0; /* Stay at the top */
@@ -280,19 +284,22 @@ body {
     /* Style page content */
     .main {
         margin-left: 360px; /* Same as the width of the sidebar */
-        margin-bottom: 150px;
+        margin-bottom: 500px;
+        height: 80%;
+        color: darkslategrey;
+        li {
+            padding: 6px 8px 6px 16px;
+            text-decoration: none;
+            font-size: 20px;
+            color: #111;
+            display: block;
+        }
     }
 
-    .main li {
-        padding: 6px 8px 6px 16px;
-        text-decoration: none;
-        font-size: 20px;
-        color: #111;
-        display: block;
-    }
 
     .playerbar {
         height: 150px;
+        margin-left: 20%;
         position: fixed;
         z-index: 1;
         bottom: 0;
@@ -308,4 +315,14 @@ body {
     .drop-nav.active > ul {
         display: block;
     }
+
+    .context-menu {
+        display: none;
+        position: absolute;
+        z-index: 10;
+      }
+      
+      .context-menu--active {
+        display: block;
+      }
 }
