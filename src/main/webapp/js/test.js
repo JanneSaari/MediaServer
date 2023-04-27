@@ -35,14 +35,6 @@ $("document").ready(function(){
       }
     })
 
-    $("#song-list").contextmenu(function(e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      
-      let element = e.target;
-      addSongToPlaylist(element);
-    });
-
     $(".album-entry").on("click", function(e){
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -67,63 +59,16 @@ $("document").ready(function(){
     $(".album-entry").contextmenu(function(e) {
       e.preventDefault();
       e.stopImmediatePropagation();
-
+  
       let element = e.target;
+  
       addAlbumToPlaylist(element);
     })
+
   });
 
   initPlayer();
 });
-
-function addSongToPlaylist(songElement) {
-  let playList = document.getElementById("play-list");
-
-  //Trying to create new entry by copying existing one
-  let exampleRow = document.getElementsByClassName("play-list-row");
-  let trackRow = exampleRow[0].cloneNode(true);
-
-  playList.appendChild(trackRow);
-
-  trackRow.querySelector(".playlist-track").innerHTML = songElement.innerHTML;
-  trackRow.getElementsByClassName("track-number")[0].innerHTML = _elements.playListRows.length + ".";
-  trackRow.setAttribute("data-track-row", _elements.playListRows.length);
-
-  //create new source for audio element
-  let source = document.createElement("source");
-  source.setAttribute("data-track-number", _elements.playListRows.length);
-  source.src = "https://" + location.host + "/MediaServer/song?id=" + songElement.getAttribute("songid");
-
-  document.getElementById("audio").appendChild(source);
-
-  //Add event listener to playlist entry
-  // let smallToggleBtn = document.getElementsByClassName("small-toggle-btn");
-  //let smallToggleBtn = _elements.playerButtons.smallToggleBtn[i];
-  let playListLink = trackRow.children[2].children[0];
-  
-  //Playlist link clicked
-  playListLink.addEventListener("click", function(e) {
-    e.preventDefault();
-    let selectedTrack = parseInt(this.parentNode.parentNode.getAttribute("data-track-row"));
-    
-    if (selectedTrack !== _currentTrack) {
-      _resetPlayStatus();
-      _currentTrack = null;
-      _trackLoaded = false;
-    }
-    
-    if(_trackLoaded === false) {
-      _currentTrack = parseInt(selectedTrack);
-      _setTrack();
-    } else {
-      _playBack(this);
-    }
-  }, false);
-}
-
-function addAlbumToPlaylist(albumElement) {
-
-}
 
 function createArtistEntry(artistJSON) {
   let ul = document.getElementById("artist-list");
@@ -446,7 +391,7 @@ let _trackLoaded = false;
    *
    **/
   let _setTrack = function() {
-    let songURL = _elements.audio.children[_currentTrack - 1].src;
+    let songURL = _elements.audio.children[_currentTrack].src;
 
     _elements.audio.setAttribute("src", songURL);
     _elements.audio.load();
@@ -473,7 +418,7 @@ let _trackLoaded = false;
       playListRows[i].children[2].className = "track-title";
     }
 
-    playListRows[currentTrack - 1].children[2].className = "track-title active-track";
+    playListRows[currentTrack -1].children[2].className = "track-title active-track";
   };
 
   /**
@@ -484,7 +429,7 @@ let _trackLoaded = false;
    **/
   let _setTrackTitle = function(currentTrack, playListRows) {
     let trackTitleBox = document.querySelector(".player .info-box .track-info-box .track-title-text");
-    let trackTitle = playListRows[currentTrack - 1].children[2].outerText;
+    let trackTitle = playListRows[currentTrack -1].querySelector(".playlist-track").innerHTML;
 
     trackTitleBox.innerHTML = null;
 
@@ -563,11 +508,11 @@ let _trackLoaded = false;
     if (audioPlaying) {
       _elements.playerButtons.largeToggleBtn.children[0].className = "large-pause-btn";
 
-      _elements.playerButtons.smallToggleBtn[_currentTrack - 1].children[0].className = "small-pause-btn";
+      _elements.playerButtons.smallToggleBtn[_currentTrack -1].children[0].className = "small-pause-btn";
     } else {
       _elements.playerButtons.largeToggleBtn.children[0].className = "large-play-btn";
 
-      _elements.playerButtons.smallToggleBtn[_currentTrack - 1].children[0].className = "small-play-btn";
+      _elements.playerButtons.smallToggleBtn[_currentTrack -1].children[0].className = "small-play-btn";
     }
 
     //Update next and previous buttons accordingly
