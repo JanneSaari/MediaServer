@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.jaudiotagger.audio.*;
 import org.jaudiotagger.audio.exceptions.*;
 import org.jaudiotagger.tag.*;
@@ -85,7 +86,6 @@ public class DatabaseAPI {
      *  Read and add song, artist, album, etc.. to database from file
      */
     void addSongFromFile(File file) {
-
         try {
             // Metadata
             AudioFile audioFile;
@@ -132,6 +132,8 @@ public class DatabaseAPI {
             // TODO Auto-generated catch block
             e.printStackTrace();
             System.out.println("File that failed: " + file.getAbsolutePath());
+        } catch (NoSuchMethodError e) {
+            //TODO stuff
         }
     }
 
@@ -149,8 +151,18 @@ public class DatabaseAPI {
                     .map(x -> x.toString()).collect(Collectors.toList());
     
             for (String string : result) {
-                File file = new File(string);
-                addSongFromFile(file);
+                try {
+                    File file = new File(string);
+
+                    String ext = FilenameUtils.getExtension(file.getName());
+                    if(ext.equals("mp3") || ext.equals("flac")) {
+                        addSongFromFile(file);
+                    }
+
+                } catch (Exception e) {
+                    //TODO: handle exception
+                    e.printStackTrace();
+                }
             }
     
         } catch (IOException e) {
@@ -401,6 +413,51 @@ public class DatabaseAPI {
 
         return arrayList;
     }
+
+
+    /**
+     * Get a playlist
+     * @param UUID, id of the playlist
+     * @return JSONArray of the playlist
+     */
+    JSONArray getPlayList(UUID playlistID) {
+        JSONArray arrayList = new JSONArray();
+        PreparedStatement ps;
+        try {
+            ps = connection.prepareStatement("""
+                SELECT 
+                    json_build_object(
+                        'order_number', playlistsongs.order_num,
+                        'song_id', playlistsongs.song_id,
+                        'song_name', songs.name
+                    )
+                FROM playlistsongs
+                INNER JOIN songs
+                    on playlistsongs.song_id = songs.id
+                WHERE playlistsongs.playlist_id = ?
+                ORDER BY order_num
+                """);
+            ps.setObject(1, playlistID);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                JSONObject object = new JSONObject(resultSet.getString("json_build_object"));
+                arrayList.put(object);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return arrayList;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    void SavePlaylist(UUID userID, JSONArray playlist) {
+
+    }
+
 
     /**
      * Get list of all songs in database and return it

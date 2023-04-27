@@ -5,13 +5,37 @@
     <title>Audio player</title>
     <link rel="stylesheet" href="css/test.css">
   </head>
+
+  
   <body>
+    
     <div class="left-sidebar">
       <ul id="artist-list">
       </ul>
     </div>
-
+    
     <div id="play-list" class="play-list">
+      <div>
+        <button id="save-playlist-btn">Save Playlist</button>
+      </div>
+      <div>
+        <button id="load-playlist-btn">Load Playlist</button>
+      </div>
+      <!-- <div class="play-list-row" data-track-row="1">
+        <div class="small-toggle-btn">
+          <i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i>
+        </div>
+        <div class="track-number">
+          1.
+        </div>
+        <div class="track-title">
+          <a class="playlist-track" href="#" data-play-track="1" data-track-id="">Test Track</a>
+        </div>
+      </div> -->
+    </div>
+
+    <!-- Template testing -->
+    <template id="track-row-template">
       <div class="play-list-row" data-track-row="1">
         <div class="small-toggle-btn">
           <i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i>
@@ -20,10 +44,10 @@
           1.
         </div>
         <div class="track-title">
-          <a class="playlist-track" href="#" data-play-track="1">Test Track</a>
+          <a class="playlist-track" href="#" data-play-track="1" data-track-id="">Test Track</a>
         </div>
       </div>
-    </div>
+    </template>
 
     <div class="main">
       <ul id="song-list">
@@ -77,8 +101,31 @@
       <!-- /.player -->
     </div>
 
+    <nav class="context-menu">
+      <ul class="context-menu__items">
+        <li class="context-menu__item">
+          <a href="#" class="context-menu__link">
+            <i class="fa fa-eye"></i> View Task
+          </a>
+        </li>
+        <li class="context-menu__item">
+          <a href="#" class="context-menu__link">
+            <i class="fa fa-edit"></i> Edit Task
+          </a>
+        </li>
+        <li class="context-menu__item">
+          <a href="#" class="context-menu__link">
+            <i class="fa fa-times"></i> Delete Task
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
     <!-- TODO download compressed jquery when hosting server. Uncompressed should be easier to debug, but compressed saves bandwith and improves perfomance -->
     <script src="js/jquery-3.5.1.js" crossorigin="anonymous"></script>
     <script src="js/test.js"></script>
+    <script src="js/playlistTest.js"></script>
+    <script src="js/contextMenu.js"></script>
+    
   </body>
 </html>
