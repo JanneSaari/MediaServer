@@ -16,5 +16,5 @@
 #3rd party
 src/main/webapp/js/jquery-3.5.1.js
 
-#Sandbox class for testing purposes
+#Serverside sandbox class for testing purposes
 src/test/java/sj/mediaserver/TestingSandbox.java
