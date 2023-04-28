@@ -1,5 +1,4 @@
 #!/bin/sh
 
-echo "Requires maven\n"
-echo "Running: mvn clean install\n"
+echo "Running: mvn clean install"
 mvn clean install
