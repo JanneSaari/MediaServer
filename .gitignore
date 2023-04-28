@@ -17,4 +17,5 @@
 src/main/webapp/js/jquery-3.5.1.js
 
 #Serverside sandbox class for testing purposes
+src/main/java/sj/mediaserver/TestingSandbox.java
 src/test/java/sj/mediaserver/TestingSandbox.java
