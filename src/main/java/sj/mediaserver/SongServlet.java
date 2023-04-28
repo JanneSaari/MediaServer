@@ -7,20 +7,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import javax.servlet.*;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
-
 @WebServlet("/song/*")
-public class SongServlet extends HttpServlet 
-{
+public class SongServlet extends HttpServlet {
     /**
      *
      */
@@ -28,13 +26,12 @@ public class SongServlet extends HttpServlet
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException
-    {
+            throws ServletException, IOException {
         DatabaseAPI api = DatabaseAPI.getInstance();
         String uuid = request.getParameter("id");
         File songFile = api.getFileFromSongID(UUID.fromString(uuid));
-        
-        //Check for file extension and set content type accordinly
+
+        // Check for file extension and set content type accordinly
         String fileType = FilenameUtils.getExtension(songFile.getName());
         switch (fileType) {
             case "flac":
@@ -63,8 +60,10 @@ public class SongServlet extends HttpServlet
 
     public static int copy(InputStream input, OutputStream output) throws IOException {
         long count = copyLarge(input, output);
-        if (count > 2147483647L) return -1;
-        else return (int) count;
+        if (count > 2147483647L)
+            return -1;
+        else
+            return (int) count;
     }
 
     public static long copyLarge(InputStream input, OutputStream output) throws IOException {
@@ -74,7 +73,7 @@ public class SongServlet extends HttpServlet
             output.write(buffer, 0, n);
             count += n;
         }
-    
+
         return count;
     }
 }
