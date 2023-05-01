@@ -10,7 +10,9 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "main", "learnignAndTesting" ]
+    branches: [ "main"]
+    paths-ignore:
+      -'.github/workflows/codeql.yml'
   pull_request:
     branches: [ "main" ]
 
@@ -21,10 +23,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up JDK 20
+    - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
-        java-version: '20'
+        java-version: '17'
         distribution: 'temurin' #https://github.com/actions/setup-java#supported-distributions
         cache: maven
     - name: Build with Maven
