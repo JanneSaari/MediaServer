@@ -61,7 +61,7 @@ jobs:
       name: Autobuild
       uses: github/codeql-action/autobuild@v2
       
-    - if: matrix.language == 'java*
+    - if: matrix.language == 'java'
       name: Build Java
       run: |
         mvn clean install
