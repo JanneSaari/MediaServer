@@ -15,18 +15,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-
-
-  <repositories>
-    <repository>
-        <id>jaudiotagger-repository</id>
-        <url>https://dl.bintray.com/ijabz/maven</url>
-    </repository>
-  </repositories>
-
+  
 
   <dependencies>
-
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
