@@ -81,9 +81,9 @@ public class DatabaseAPI {
             e.printStackTrace();
         }
     }
-    
+
     /**
-     *  Read and add song, artist, album, etc.. to database from file
+     * Read and add song, artist, album, etc.. to database from file
      */
     void addSongFromFile(File file) {
         try {
@@ -95,35 +95,33 @@ public class DatabaseAPI {
             audioFile = AudioFileIO.read(file);
             tag = audioFile.getTag();
             audioHeader = audioFile.getAudioHeader();
-            
-            //Artist
+
+            // Artist
             Artist artist = new Artist();
             artist.setName(tag.getFirst(FieldKey.ALBUM_ARTIST));
             System.out.println(checkIfArtistExists(artist.getName()));
-            if(!checkIfArtistExists(artist.getName())){
+            if (!checkIfArtistExists(artist.getName())) {
                 addArtist(artist);
-            }
-            else
+            } else
                 System.out.println("Artist: " + artist.getName() + " already exists in database!");
 
-            //Album
+            // Album
             Album album = new Album();
             album.setArtist(artist);
             album.setName(tag.getFirst(FieldKey.ALBUM));
             System.out.println(checkIfAlbumExists(album.getName()));
-            if(!checkIfAlbumExists(album.getName())){
+            if (!checkIfAlbumExists(album.getName())) {
                 addAlbum(album);
-            }
-            else
+            } else
                 System.out.println("Album: " + album.getName() + " already exists in database!");
 
-            //Song
+            // Song
             Song song = new Song();
             song.setName(tag.getFirst(FieldKey.TITLE));
             song.setAlbum(album);
             song.setArtist(artist);
             song.setSongFile(file);
-            
+
             addFile(file);
             addSong(song);
 
@@ -133,38 +131,38 @@ public class DatabaseAPI {
             e.printStackTrace();
             System.out.println("File that failed: " + file.getAbsolutePath());
         } catch (NoSuchMethodError e) {
-            //TODO stuff
+            // TODO stuff
         }
     }
 
-
     /**
-    * Adds all songs, artists, etc from folder and subfolders to database
-    */
-    void addAllSongRecursively(String folderpath){
-        //TODO make library directories that get scanned automatically and changes get added to database
-        //TODO rename to something better
+     * Adds all songs, artists, etc from folder and subfolders to database
+     */
+    public void addAllSongRecursively(String folderpath) {
+        // TODO make library directories that get scanned automatically and changes get
+        // added to database
+        // TODO rename to something better
 
         try (Stream<Path> walk = Files.walk(Paths.get(folderpath))) {
 
             List<String> result = walk.filter(Files::isRegularFile)
                     .map(x -> x.toString()).collect(Collectors.toList());
-    
+
             for (String string : result) {
                 try {
                     File file = new File(string);
 
                     String ext = FilenameUtils.getExtension(file.getName());
-                    if(ext.equals("mp3") || ext.equals("flac")) {
+                    if (ext.equals("mp3") || ext.equals("flac")) {
                         addSongFromFile(file);
                     }
 
                 } catch (Exception e) {
-                    //TODO: handle exception
+                    // TODO: handle exception
                     e.printStackTrace();
                 }
             }
-    
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -187,12 +185,12 @@ public class DatabaseAPI {
             e.printStackTrace();
         }
     }
-    
+
     void addArtist(Artist artist) {
         System.out.println("Trying to add artist: " + artist.getName());
         try {
             addArtistStatement.setString(1, artist.getName());
-            
+
             addArtistStatement.executeUpdate();
             System.out.println("Artist: " + artist.getName() + " added successfully!");
         } catch (Exception e) {
@@ -200,13 +198,13 @@ public class DatabaseAPI {
             e.printStackTrace();
         }
     }
-    
+
     void addAlbum(Album album) {
         System.out.println("Trying to add album: " + album.getName());
         try {
             addAlbumStatement.setString(1, album.getName());
             addAlbumStatement.setString(2, album.getArtist().getName());
-            
+
             addAlbumStatement.executeUpdate();
             System.out.println("Album: " + album.getName() + " added successfully!");
         } catch (Exception e) {
@@ -214,12 +212,12 @@ public class DatabaseAPI {
             e.printStackTrace();
         }
     }
-    
+
     void addFile(File file) {
         System.out.println("Trying to add file: " + file.getAbsolutePath());
         try {
             addFileStatement.setString(1, file.getAbsolutePath());
-            
+
             addFileStatement.executeUpdate();
             System.out.println("File: " + file.getAbsolutePath() + " added successfully!");
         } catch (SQLException e) {
@@ -227,15 +225,15 @@ public class DatabaseAPI {
             e.printStackTrace();
         }
     }
-    
+
     Song getSongData() {
-        //Currently just a placeholder function 
-        
+        // Currently just a placeholder function
+
         Song song = new Song();
         return song;
     }
 
-    //FIXME currently just gets first file and returns its filepath
+    // FIXME currently just gets first file and returns its filepath
     String getFilePath() {
         String filepath = "";
         try {
@@ -248,10 +246,12 @@ public class DatabaseAPI {
         }
         return filepath;
     }
-    
-    //TODO create another file function getFile(Song) to get file identified from song data
+
+    // TODO create another file function getFile(Song) to get file identified from
+    // song data
     /**
      * Get file from database identified by UUID id
+     * 
      * @param id Used to identify wanted file
      * @return File. Returns file identified by id.
      */
@@ -273,9 +273,10 @@ public class DatabaseAPI {
         return file;
     }
 
-
     /**
-     * Get file from database identified by songID. If you have fileID, use getFile(UUID id) instead
+     * Get file from database identified by songID. If you have fileID, use
+     * getFile(UUID id) instead
+     * 
      * @param songID Used to identify wanted file. Note: this is songID, not fileID.
      * @return File identified by songID
      */
@@ -285,12 +286,12 @@ public class DatabaseAPI {
         PreparedStatement ps;
         try {
             ps = connection.prepareStatement("""
-                SELECT file_path
-                FROM files
-                INNER JOIN songs
-                    on songs.file_id = files.id
-                    WHERE songs.id = ?
-            """);
+                        SELECT file_path
+                        FROM files
+                        INNER JOIN songs
+                            on songs.file_id = files.id
+                            WHERE songs.id = ?
+                    """);
             ps.setObject(1, songID);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
@@ -303,9 +304,9 @@ public class DatabaseAPI {
         return file;
     }
 
-
     /**
      * Get list of all artists in database and return it
+     * 
      * @return ArrayList<Artist> list of all artists in database
      */
     ArrayList<Artist> getArtists() {
@@ -313,11 +314,11 @@ public class DatabaseAPI {
         PreparedStatement ps;
         try {
             ps = connection.prepareStatement("""
-                SELECT
-                    name
-                FROM
-                    artists
-                """);
+                    SELECT
+                        name
+                    FROM
+                        artists
+                    """);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 Artist artist = new Artist(resultSet.getString("name"));
@@ -334,12 +335,13 @@ public class DatabaseAPI {
      * Get list of all artists with their albums and songs
      * Returns list in format:
      * Artists[]
-     *      artist_name,
-     *      Albums[]
-     *          album_name,
-     *          Songs[]
-     *              song_name,
-     *              song_id
+     * artist_name,
+     * Albums[]
+     * album_name,
+     * Songs[]
+     * song_name,
+     * song_id
+     * 
      * @return JSONArray list of all artists and their albums and songs in JSON form
      */
     JSONArray getLibraryList() {
@@ -347,30 +349,30 @@ public class DatabaseAPI {
         PreparedStatement ps;
         try {
             ps = connection.prepareStatement("""
-                SELECT
-                json_build_object(
-                    'artist_name', artists.name,
-                    'albums', json_agg(
-                        json_build_object(
-                            'album_name', to_json(albums.name),
-                            'album_id', to_json(albums.id),
-                            'songs', (
-                                SELECT json_agg(
-                                    json_build_object(
-                                        'song_name', songs.name,
-                                        'song_id', songs.id)
-                                    )
-                                FROM songs
-                                WHERE songs.album_id = albums.id
+                    SELECT
+                    json_build_object(
+                        'artist_name', artists.name,
+                        'albums', json_agg(
+                            json_build_object(
+                                'album_name', to_json(albums.name),
+                                'album_id', to_json(albums.id),
+                                'songs', (
+                                    SELECT json_agg(
+                                        json_build_object(
+                                            'song_name', songs.name,
+                                            'song_id', songs.id)
+                                        )
+                                    FROM songs
+                                    WHERE songs.album_id = albums.id
+                                )
                             )
                         )
                     )
-                )
-                FROM artists
-                INNER JOIN albums
-                    on albums.artist_id = artists.id
-                GROUP BY artists.name
-                """);
+                    FROM artists
+                    INNER JOIN albums
+                        on albums.artist_id = artists.id
+                    GROUP BY artists.name
+                    """);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 JSONObject object = new JSONObject(resultSet.getString("json_build_object"));
@@ -385,7 +387,8 @@ public class DatabaseAPI {
 
     /**
      * Get list of songs in album
-     * @param album 
+     * 
+     * @param album
      * @return JSONArray of all songs in album
      */
     JSONArray getSongList(UUID albumID) {
@@ -393,14 +396,14 @@ public class DatabaseAPI {
         PreparedStatement ps;
         try {
             ps = connection.prepareStatement("""
-                SELECT
-                    json_build_object(
-                        'song_name', songs.name,
-                        'song_id', songs.id
-                    )
-                FROM songs
-                WHERE songs.album_id = ?;
-                """);
+                    SELECT
+                        json_build_object(
+                            'song_name', songs.name,
+                            'song_id', songs.id
+                        )
+                    FROM songs
+                    WHERE songs.album_id = ?;
+                    """);
             ps.setObject(1, albumID);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
@@ -414,9 +417,9 @@ public class DatabaseAPI {
         return arrayList;
     }
 
-
     /**
      * Get a playlist
+     * 
      * @param UUID, id of the playlist
      * @return JSONArray of the playlist
      */
@@ -425,18 +428,18 @@ public class DatabaseAPI {
         PreparedStatement ps;
         try {
             ps = connection.prepareStatement("""
-                SELECT 
-                    json_build_object(
-                        'order_number', playlistsongs.order_num,
-                        'song_id', playlistsongs.song_id,
-                        'song_name', songs.name
-                    )
-                FROM playlistsongs
-                INNER JOIN songs
-                    on playlistsongs.song_id = songs.id
-                WHERE playlistsongs.playlist_id = ?
-                ORDER BY order_num
-                """);
+                    SELECT
+                        json_build_object(
+                            'order_number', playlistsongs.order_num,
+                            'song_id', playlistsongs.song_id,
+                            'song_name', songs.name
+                        )
+                    FROM playlistsongs
+                    INNER JOIN songs
+                        on playlistsongs.song_id = songs.id
+                    WHERE playlistsongs.playlist_id = ?
+                    ORDER BY order_num
+                    """);
             ps.setObject(1, playlistID);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
@@ -458,9 +461,9 @@ public class DatabaseAPI {
 
     }
 
-
     /**
      * Get list of all songs in database and return it
+     * 
      * @return ArrayList<Song> list of all songs in database
      */
     ArrayList<Song> getSongs() {
@@ -468,24 +471,24 @@ public class DatabaseAPI {
         PreparedStatement ps;
         try {
             ps = connection.prepareStatement("""
-                SELECT
-                    songs.name as song_name,
-                    artists.name as artist_name,
-                    albums.name as album_name
-                FROM 
-                    songs
-                INNER JOIN albums
-                    on songs.album_id = albums.id
-                INNER JOIN artists
-                    on songs.artist_id = artists.id        
-                """);
+                    SELECT
+                        songs.name as song_name,
+                        artists.name as artist_name,
+                        albums.name as album_name
+                    FROM
+                        songs
+                    INNER JOIN albums
+                        on songs.album_id = albums.id
+                    INNER JOIN artists
+                        on songs.artist_id = artists.id
+                    """);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 Song song = new Song();
                 song.setName(resultSet.getString("song_name"));
                 song.setAlbum(resultSet.getString("album_name"));
                 song.setArtist(resultSet.getString("artist_name"));
-                
+
                 songs.add(song);
             }
         } catch (SQLException e) {
@@ -495,9 +498,9 @@ public class DatabaseAPI {
         return songs;
     }
 
-
     /**
      * Get list of all albums in database and return it
+     * 
      * @return ArrayList<Album> list of all albums in database
      */
     ArrayList<Album> getAlbums() {
@@ -516,24 +519,24 @@ public class DatabaseAPI {
         return albums;
     }
 
-    //TODO dont use text password
-    int addUser(String userName, String password) {
+    // TODO dont use text password
+    public int addUser(String userName, String password) {
         PreparedStatement ps;
         try {
             ps = connection.prepareStatement("""
-                WITH data(userName, password) AS (
-                    VALUES (?, crypt(?, gen_salt('bf')))
-                ),
-                ins1 AS (
-                    INSERT INTO users(name)
-                    SELECT userName FROM data
-                --ON CONFLICT DO NOTHING
-                RETURNING id AS user_id
-                )
-                INSERT INTO passwords(password_hash, user_id)
-                SELECT password, ins1.user_id
-                FROM data, ins1
-            """);
+                        WITH data(userName, password) AS (
+                            VALUES (?, crypt(?, gen_salt('bf')))
+                        ),
+                        ins1 AS (
+                            INSERT INTO users(name)
+                            SELECT userName FROM data
+                        --ON CONFLICT DO NOTHING
+                        RETURNING id AS user_id
+                        )
+                        INSERT INTO passwords(password_hash, user_id)
+                        SELECT password, ins1.user_id
+                        FROM data, ins1
+                    """);
 
             ps.setString(1, userName);
             ps.setString(2, password);
@@ -545,28 +548,28 @@ public class DatabaseAPI {
         return 0;
     }
 
-
     /**
      * Check if userName already exists in database
+     * 
      * @param userName Username to check
-     * @return -1 if check failed for some reason, 0 if username doesn't exist, 1 if username exists already
+     * @return -1 if check failed for some reason, 0 if username doesn't exist, 1 if
+     *         username exists already
      */
-    int checkIfUserNameExists(String userName) {        
+    int checkIfUserNameExists(String userName) {
         PreparedStatement ps;
         try {
             ps = connection.prepareStatement("""
-                SELECT name
-                FROM users
-                WHERE name = ?
-            """);
+                        SELECT name
+                        FROM users
+                        WHERE name = ?
+                    """);
 
             ps.setString(1, userName);
 
             ResultSet rs = ps.executeQuery();
-            if(rs.next()) {
+            if (rs.next()) {
                 return 1;
-            }
-            else
+            } else
                 return 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -576,27 +579,29 @@ public class DatabaseAPI {
 
     /**
      * Authenticate user
+     * 
      * @param userName Username to check
      * @param password Users password
-     * @return 1 if user is valid. 0 if user is not valid. -1 if authentication failed for some reason
+     * @return 1 if user is valid. 0 if user is not valid. -1 if authentication
+     *         failed for some reason
      */
     int authenticateUser(String userName, String password) {
         PreparedStatement ps;
         try {
             ps = connection.prepareStatement("""
-                SELECT 
-                    name,
-                    passwords.password_hash as password
-                FROM users
-                INNER JOIN passwords
-                    ON users.id = passwords.user_id
-                WHERE
-                name = ? AND passwords.password_hash = crypt(?, passwords.password_hash)
-            """);
+                        SELECT
+                            name,
+                            passwords.password_hash as password
+                        FROM users
+                        INNER JOIN passwords
+                            ON users.id = passwords.user_id
+                        WHERE
+                        name = ? AND passwords.password_hash = crypt(?, passwords.password_hash)
+                    """);
             ps.setString(1, userName);
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
-            if(rs.next()) {
+            if (rs.next()) {
                 return 1;
             }
         } catch (SQLException e) {
@@ -619,7 +624,7 @@ public class DatabaseAPI {
             queryStatement.setString(2, artist);
 
             ResultSet rs = queryStatement.executeQuery();
-            if(rs.next())
+            if (rs.next())
                 return true;
         } catch (SQLException e) {
             // TODO Auto-generated catch block
@@ -637,7 +642,7 @@ public class DatabaseAPI {
             albumQueryStatement.setString(2, album);
 
             ResultSet rs = albumQueryStatement.executeQuery();
-            if(rs.next())
+            if (rs.next())
                 return true;
         } catch (SQLException e) {
             // TODO Auto-generated catch block
@@ -646,7 +651,6 @@ public class DatabaseAPI {
 
         return false;
     }
-    
 
     private static void askAuthInfo() {
         Console cons;
